@@ -1,0 +1,2 @@
+# didactic-giggle
+discord上でtwitterのユーティリティを利用できるようにするbotです
