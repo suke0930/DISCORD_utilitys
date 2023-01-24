@@ -6,8 +6,6 @@ const Twit = require('twitter');//twitterのライブラリ
 const { Client, GatewayIntentBits, Partials } = require('discord.js'); //discord.js から読み込む
 // const DiscordBASE = require('discord.js');//DISCORDライブラリの呼び出し
 const fs = require('fs');//FILE読み書きするやつ
-const { SERVFAIL } = require('dns');
-const { Server } = require('http');
 // const DICONFIG = JSON.parse(dicondigtext.toString());
 // const DISCORD = new DiscordBASE.Client(Discord.Intents.ALL);
 //これってサーバーごとに必要とかそういうあれじゃないよね...多分
