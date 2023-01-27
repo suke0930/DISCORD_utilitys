@@ -145,7 +145,6 @@ async function get_user_tweet(userID, count) {
                 };
             };
         };
-        // console.log("FOR解放！")
     };
 
     function sendmessege(SID, CID, messege) {//指定されたチャンネルにメッセージを送る
@@ -229,8 +228,16 @@ async function get_user_tweet(userID, count) {
                         any_notification(ServerDATA, "emergancy", "なにかbotに障害が出ています！get_user_tweetのpromiseがエラーを吐いたようです！")//チャンネルに流す。引数は（[データ],プロパティの名前,送信内容のテキスト）
                     }
                     if (errorflag !== 1) {
-                        if (data_detail.latest_ID == tweet[I].id) { break; }
-                    }
+
+                        try {//tweet[0]すらもundifindだとエラー落ちする。
+                            //将来的に根本的にundifindが代入されないようにエラー分岐を作るべき。
+                            //issueに書いとく。
+                            if (data_detail.latest_ID == tweet[I].id) { break; }
+                        } catch (error) {//強制的にbreakする
+                            break;
+                        };
+                    };
+
                 };
                 try {
                     if (!skipflag == 1) {
@@ -356,8 +363,8 @@ async function get_user_tweet(userID, count) {
 
                     // await twitter_send(ServerDATA, data_detail)")
                     setInterval(async () => {//定期的にツイート等確認する
-                        console.log("るーぷ")
-                        const length = Object.keys(ServerDATA)
+                        console.log("るーぷ");
+                        const length = Object.keys(ServerDATA);
                         save_server_data(ServerDATA);
                         for (I_looper = 0; I_looper < length.length; I_looper++) {//propの数を検知してその分だけまわす
 
@@ -376,17 +383,15 @@ async function get_user_tweet(userID, count) {
                                         get_data_type: "USER",
                                         prop: length[I_looper],
                                         limit_get: Serverconifg.countlimit
-                                    }
-                                    await twitter_send(ServerDATA, data_detail)
-                                }
-                            }
-                        }
+                                    };
+                                    await twitter_send(ServerDATA, data_detail);
+                                };
+                            };
+                        };
                         console.log("無限ループやないで！")
                     }, Serverconifg.looptime);
                     Serverconifg.looptime
-                }
-
-
+                };
                 if (message.content.startsWith('!TWN_delete')) {//本業
                     const PROPNAME = message.content.slice(12); //ユーザー名
                     if (ServerDATA[PROPNAME][message.guildId]) { delete ServerDATA[PROPNAME][message.guildId]; }
@@ -400,21 +405,13 @@ async function get_user_tweet(userID, count) {
                     // // const input2 = 
                     // const SERVICENAME = (message.content.slice(message.content.indexOf("/") + 1, message.content.indexOf("@"))); //サービス名
                     const PROPNAME = (message.content.slice(14)); //プロパティ名
-                    // console.log('ユーザー名:' + USERNAME + ' サービス名:' + SERVICENAME + ' プロパティ名:' + PROPNAME);
-                    // console.log(input)
                     // setchannel(messege)//setchannelする（）
-                    // console.log(message.channel)//でばっぐ
-                    // console.log(`);
-                    // message.channel.send(input);
-
-
                     find_serverID(ServerDATA, message, PROPNAME);
                     message.channel.send(`チャンネルID: ${ServerDATA["SID" + message.guild.id].channelID} サーバーID: ${message.guild.id} プロパティ: ${PROPNAME}`);
 
                     // message.channel.send('hi!');
                 };
-                // console.log("404 Idea not found(アイデアがないよ！)")
-            }//</本番コマンド>
+            };//</本番コマンド>
 
 
 
@@ -429,8 +426,8 @@ async function get_user_tweet(userID, count) {
 
 
 
-        }
-    })
+        };
+    });
 };
 
 
