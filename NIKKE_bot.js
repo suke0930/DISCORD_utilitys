@@ -184,13 +184,13 @@ async function get_user_tweet(userID, count) {
 
     /**
      * //twitterから情報を取得しdiscordのサー-バーに流す。thenまで内蔵しているためpromiceを得る必要はない...?
-     *     //  data_detail.get_data_type      //ツイッターに問い合わせるRequestの種類。これがすべての始まりになり得る。
-     *   //  data_detail.request_content    //ツイッターのIDや検索ワードなどのデータ
-     *   //  data_detail.prop               //プロパティの名前
-     *   //  data_detail.URL                //twitterに問い合わせるリンク。
-     *   //  data_detail.count              //ツイートをいくつまで遡って取得するか
-     *   //  data_detail.limit_get          //取得できていないツイートをいくつまで遡って取得するか 0の場合は一件しか取得しない
-     *   //  data_detail.latest_ID          //最後に入力したtweetのIDを覚えておく
+     * @param {string} data_detail.get_data_type ツイッターに問い合わせるRequestの種類。これがすべての始まりになり得る。
+     * @param {string} data_detail.request_content ツイッターのIDや検索ワードなどのデータ
+     * @param {string} data_detail.prop プロパティの名前
+     * @param {string} data_detail.URL  witterに問い合わせるリンク。
+     * @param {string} data_detail.count ツイートをいくつまで遡って取得するか
+     * @param {string} data_detail.limit_get 取得できていないツイートをいくつまで遡って取得するか 0の場合は一件しか取得しない
+     * @param {string} data_detail.latest_ID 最後に入力したtweetのIDを覚えておく
      *   ////[実装済みリスト]
      *   //USER = 
      *   //
@@ -355,29 +355,14 @@ async function get_user_tweet(userID, count) {
                 if (message.content == '!TWN_start') {//定義されたチャンネルにツイートを投げる
                     message.channel.send(`起動中...`);
                     const PROPNAME = message.content.slice(11, message.content.indexOf("/")); //ユーザー名
-                    // const data_detail = {
-                    //     get_data_type: "USER",
-                    //     prop: "sukesub",
-                    //     limit_get: 3
-                    // }
-
-                    // await twitter_send(ServerDATA, data_detail)")
                     setInterval(async () => {//定期的にツイート等確認する
                         console.log("るーぷ");
                         const length = Object.keys(ServerDATA);
                         save_server_data(ServerDATA);
                         for (I_looper = 0; I_looper < length.length; I_looper++) {//propの数を検知してその分だけまわす
-
-
-                            //  console.log("何が起きてるんや？")
-
-
                             const alpha = length[I_looper].indexOf("SID")
-                            //  console.log("えぇ:" + alpha + "なんで？" + length[I_looper])
                             if (alpha !== 0) {//SIDを除外
                                 if (!(length[I_looper] == "emergancy")) {//emergancyを除外
-
-
                                     //  console.log("君はどういう関数難題？" + length[I_looper])
                                     const data_detail = {
                                         get_data_type: "USER",
