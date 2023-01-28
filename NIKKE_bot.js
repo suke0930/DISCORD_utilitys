@@ -130,22 +130,33 @@ async function get_user_tweet(userID, count) {
 
 
     function any_notification(ServerDATA, DATANAME, TEXT) {//プロパティに登録してあるチャンネルに情報を一斉送信する
+        /**
+         * @param {string} DATANAME any_notificationで使われる値。基本的に中身はpropsと同じ意味を持つ。とっとと修正しろ！！！！！！！！！！！！！！！ 
+         */
         //呼び出し方:any_notification(ServerDATA(これで固定), DATANAME(送信したいプロパティ), TEXT(送信したい文字))
-        const DATANAMEprop = Object.keys(ServerDATA[DATANAME]);
-        for (let I = 0; I < DATANAMEprop.length; I++) {
-            if (DATANAMEprop[I] !== "USER") {
-                if ((DATANAMEprop[I] !== "plat")) {
-                    if (DATANAMEprop[I] !== "last") {
-                        //サーバ一覧のIDを引っ張り出す
-                        //object.keyに対する配列番号によるデーターの取得
-                        //ServerDATA[NIKKE_ID_LIST]==Server.DATAの、"SID"+ServerDATA.[DATENAME]に対するkeyの配列番号を用いたキーの取得
-                        console.log(DATANAMEprop[I])
-                        console.log(ServerDATA[DATANAME][DATANAMEprop[I]])
-                        sendmessege(DATANAMEprop[I], ServerDATA[DATANAME][DATANAMEprop[I]].CID, TEXT)
+        // const DATANAMEprop = Object.keys(ServerDATA[DATANAME]);
+        try {
+
+            for (const DATANAMEprop of ServerDATA[DATANAME]) {//discordのチャンネルに通知を送るためのループ
+                if (DATANAMEprop !== "USER") {
+                    if ((DATANAMEprop !== "plat")) {
+                        if (DATANAMEprop !== "last") {
+                            //サーバ一覧のIDを引っ張り出す
+                            //object.keyに対する配列番号によるデーターの取得
+                            //ServerDATA[NIKKE_ID_LIST]==Server.DATAの、"SID"+ServerDATA.[DATENAME]に対するkeyの配列番号を用いたキーの取得
+                            console.log(DATANAMEprop)
+                            console.log(ServerDATA[DATANAME][DATANAMEprop])
+                            sendmessege(DATANAMEprop, ServerDATA[DATANAME][DATANAMEprop].CID, TEXT)
+                        };
                     };
                 };
             };
-        };
+        } catch (error) {
+            any_notification(ServerDATA, "emergancy", "DISCORDのサーバにメッセージが送れないのだ！(CV.ずんだもん)")
+            any_notification(ServerDATA, "emergancy", "エラーの名前なのだ！：" + error.name)
+            any_notification(ServerDATA, "emergancy", "エラーの内容なのだ！：" + error.message)
+            any_notification(ServerDATA, "emergancy", "代入されたpropなのだ！" + DATANAME)
+        }
     };
 
     function sendmessege(SID, CID, messege) {//指定されたチャンネルにメッセージを送る
@@ -223,7 +234,9 @@ async function get_user_tweet(userID, count) {
                  * @param {string} errorflag 主にgettweet()関数でエラーを吐いた場合にスローするための分岐フラグ
                  * @param {string} zero_is_undifind tweet[0]にデーターが挿入されなかった場合の分岐フラグ
                  */
-                for (let I = 0; I < data_detail.limit_get; I++) {
+
+
+                for (let I = 0; I < data_detail.limit_get; I++) {//リミットにぶち当たるまで問い合わせを続ける
                     try {
                         tweet = await get_user_tweet(ServerDATA[data_detail.prop].USER, (I + 1))
                         if (tweet[0] === undefined) {//エラー分岐
@@ -259,20 +272,27 @@ async function get_user_tweet(userID, count) {
                     };
 
                 };
+
+
                 try {
                     if (skipflag !== true) {
                         //ここからは入手したデーターの変換処理 & 古いものから順に流すためにいろいろする    
                         // for (I = 0; I < DATANAMEprop.length; I++) {
                         //     //サーバ一覧のIDを引っ張り出す
-                        //     const NIKKE_ID_LIST = "SID" + DATANAMEprop[I]//↑のobject.keyに対する配列番号によるデーターの取得
+                        //     const NIKKE_ID_LIST = "SID" + DATANAMEprop//↑のobject.keyに対する配列番号によるデーターの取得
                         //     //ServerDATA[NIKKE_ID_LIST]==Server.DATAの、"SID"+ServerDATA.[DATENAME]に対するkeyの配列番号を用いたキーの取得
                         //     sendmessege(ServerDATA[NIKKE_ID_LIST].serverID, ServerDATA[NIKKE_ID_LIST].channelID, TEXT)
                         // };
                         const length2 = Object.keys(tweet)//tweetの配列数を計算する
-                        for (let I = 0; I < length2.length; I++) {//
-                            const text = "https://twitter.com/" + tweet[I].user.id + "/status/" + tweet[I].id_str//アクセスできる形式に変換
+
+
+                        for (const tweetone of tweet) {//
+                            /**
+                             * @param {object} tweetone for文で取り出すことを前提としたtweetの要素。
+                             */
+                            const text = "https://twitter.com/" + tweetone.user.id + "/status/" + tweetone.id_str//アクセスできる形式に変換
                             // any_notification(ServerDATA, data_detail.prop, text)//チャンネルに流す。引数は（[データ],プロパティの名前,送信内容のテキスト
-                            if (ServerDATA[data_detail.prop].last === tweet[I].id) {
+                            if (ServerDATA[data_detail.prop].last === tweetone.id) {
                                 skipflag = true
                                 break;
                             }
@@ -377,17 +397,18 @@ async function get_user_tweet(userID, count) {
                     const PROPNAME = message.content.slice(11, message.content.indexOf("/")); //ユーザー名
                     setInterval(async () => {//定期的にツイート等確認する
                         console.log("るーぷ");
-                        const length = Object.keys(ServerDATA);
+                        const length = Object.keys(ServerDATA);//SERVERDATAちょっかのもろもろをしらべる
                         save_server_data(ServerDATA);
-                        for (I_looper = 0; I_looper < length.length; I_looper++) {//propの数を検知してその分だけまわす
-                            const alpha = length[I_looper].indexOf("SID")
+                        for (I_looper of ServerDATA) {//propの数を検知してその分だけまわす
+
+                            const alpha = I_looper.indexOf("SID")
                             if (alpha !== 0) {//SIDを除外
-                                if (!(length[I_looper] === "emergancy")) {//emergancyを除外
-                                    //  console.log("君はどういう関数難題？" + length[I_looper])
+                                if (!(I_looper === "emergancy")) {//emergancyを除外
+                                    //  console.log("君はどういう関数難題？" + I_looper)
                                     try {
                                         const data_detail = {
                                             get_data_type: "USER",
-                                            prop: length[I_looper],
+                                            prop: I_looper,
                                             limit_get: Serverconifg.countlimit
                                         };
                                         await twitter_send(ServerDATA, data_detail);
