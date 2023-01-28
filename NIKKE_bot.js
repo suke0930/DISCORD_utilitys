@@ -213,7 +213,7 @@ async function get_user_tweet(userID, count) {
 
         if (data_detail.get_data_type === "USER") {//ユーザーのデータを要求された場合
             if (!data_detail.limit_get === 0) {//遡る件数を指定された場合遡る
-                let skipflag = 0
+                let skipflag = false
                 let tweet = {}
                 let errorflag = 0
                 let zero_is_undifind = 0
@@ -231,7 +231,7 @@ async function get_user_tweet(userID, count) {
                             throw error;
                         }
                         if (ServerDATA[data_detail.prop].last === tweet[0].id) {
-                            skipflag = 1
+                            skipflag = true
                             break;
                         }
                     } catch (error) {//何らかの理由により取得できなかった場合
@@ -260,7 +260,7 @@ async function get_user_tweet(userID, count) {
 
                 };
                 try {
-                    if (!skipflag === 1) {
+                    if (skipflag !== true) {
                         //ここからは入手したデーターの変換処理 & 古いものから順に流すためにいろいろする    
                         // for (I = 0; I < DATANAMEprop.length; I++) {
                         //     //サーバ一覧のIDを引っ張り出す
@@ -268,19 +268,19 @@ async function get_user_tweet(userID, count) {
                         //     //ServerDATA[NIKKE_ID_LIST]==Server.DATAの、"SID"+ServerDATA.[DATENAME]に対するkeyの配列番号を用いたキーの取得
                         //     sendmessege(ServerDATA[NIKKE_ID_LIST].serverID, ServerDATA[NIKKE_ID_LIST].channelID, TEXT)
                         // };
-                        const length2 = Object.keys(tweet)
-                        for (let I = 0; I < length2.length; I++) {
+                        const length2 = Object.keys(tweet)//tweetの配列数を計算する
+                        for (let I = 0; I < length2.length; I++) {//
                             const text = "https://twitter.com/" + tweet[I].user.id + "/status/" + tweet[I].id_str//アクセスできる形式に変換
                             // any_notification(ServerDATA, data_detail.prop, text)//チャンネルに流す。引数は（[データ],プロパティの名前,送信内容のテキスト
                             if (ServerDATA[data_detail.prop].last === tweet[I].id) {
-                                skipflag = 1
+                                skipflag = true
                                 break;
                             }
 
-                            any_notification(ServerDATA, data_detail.prop, "[プレビュー表示用]");//チャンネルに流す。引数は（[データ],プロパティの名前,送信内容のテキスト）
+                            //   any_notification(ServerDATA, data_detail.prop, "[プレビュー表示用]");//チャンネルに流す。引数は（[データ],プロパティの名前,送信内容のテキスト）
 
 
-                            any_notification(ServerDATA, data_detail.prop, text)//チャンネルに流す。引数は（[データ],プロパティの名前,送信内容のテキスト）
+                            any_notification(ServerDATA, data_detail.prop, text)//ここでDISCORDのチャンネルに通知を流す
                             //  any_notification(ServerDATA, "emergancy", "なにかbotに障害が出ています！get_user_tweetのpromiseがエラーを吐いたようです！");//チャンネルに流す。引数は（[データ],プロパティの名前,送信内容のテキスト）
                             //</ここからは入手したデーターの変換処理 & 古いものから順に流すためにいろいろする>
                         };
