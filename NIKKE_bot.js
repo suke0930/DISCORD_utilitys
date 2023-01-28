@@ -3,6 +3,7 @@
 const Twit = require('twitter');//twitterのライブラリ
 const { Client, GatewayIntentBits, Partials } = require('discord.js'); //discord.js から読み込む
 const fs = require('fs');//FILE読み書きするやつ
+const { error } = require('console');
 const twconfig = JSON.parse(fs.readFileSync("./config/twconfig.json", 'utf8').toString());//APIKEY読み出し 前回やったね☆ 
 const dicondigtext = JSON.parse(fs.readFileSync("./config/diconfig.json", 'utf8').toString());//CONFIG読み出し 前回やったね☆
 const ServerDATA = JSON.parse(fs.readFileSync("./ServerDATA.json", 'utf8').toString());//チャンネルID呼び出し
@@ -83,10 +84,10 @@ function savejson(saveDATA, Jsonname, log_flag) {//jsonセーブするためだ�
     const jsonData = JSON.stringify(saveDATA);
     fs.writeFile(Jsonname, jsonData, (err) => {
         if (err) {
-            if (log_flag == true) { console.error(err) };
+            if (log_flag === true) { console.error(err) };
             return;
         }
-        if (log_flag == true) { console.log(Jsonname + ' saved successfully'); };
+        if (log_flag === true) { console.log(Jsonname + ' saved successfully'); };
     });
 }
 
@@ -210,15 +211,26 @@ async function get_user_tweet(userID, count) {
         //↑例
         //呼び出し方:any_notification(ServerDATA(これで固定), DATANAME(送信したいプロパティ), TEXT(送信したい文字))
 
-        if (data_detail.get_data_type == "USER") {//ユーザーのデータを要求された場合
-            if (!data_detail.limit_get == 0) {//遡る件数を指定された場合遡る
+        if (data_detail.get_data_type === "USER") {//ユーザーのデータを要求された場合
+            if (!data_detail.limit_get === 0) {//遡る件数を指定された場合遡る
                 let skipflag = 0
                 let tweet = {}
                 let errorflag = 0
+                let zero_is_undifind = 0
+                /**
+                 * @param {string} skipflag ツイートに更新がなかった際にスキップする判定フラグ
+                 * @param {object} tweet ツイートの取得データー。。
+                 * @param {string} errorflag 主にgettweet()関数でエラーを吐いた場合にスローするための分岐フラグ
+                 * @param {string} zero_is_undifind tweet[0]にデーターが挿入されなかった場合の分岐フラグ
+                 */
                 for (let I = 0; I < data_detail.limit_get; I++) {
                     try {
                         tweet = await get_user_tweet(ServerDATA[data_detail.prop].USER, (I + 1))
-                        if (ServerDATA[data_detail.prop].last == tweet[0].id) {
+                        if (tweet[0] === undefined) {//エラー分岐
+                            zero_is_undifind = 1
+                            throw error;
+                        }
+                        if (ServerDATA[data_detail.prop].last === tweet[0].id) {
                             skipflag = 1
                             break;
                         }
@@ -226,21 +238,29 @@ async function get_user_tweet(userID, count) {
                         console.log("Error!111");
                         errorflag = 1
                         any_notification(ServerDATA, "emergancy", "なにかbotに障害が出ています！get_user_tweetのpromiseがエラーを吐いたようです！")//チャンネルに流す。引数は（[データ],プロパティの名前,送信内容のテキスト）
-                    }
-                    if (errorflag !== 1) {
+                        if (zero_is_undifind === 1) {
+                            any_notification(ServerDATA, "emergancy", "どうやらtweet[0]すら消滅したようです...　参照されたpropsは" + prop + "です。")//チャンネルに流す。引数は（[データ],プロパティの名前,送信内容のテキスト）}
+                        }
 
-                        try {//tweet[0]すらもundifindだとエラー落ちする。
+                        if (errorflag !== 1 && zero_is_undifind !== 1) {
+
+                            //tweet[0]すらもundifindだとエラー落ちする。
                             //将来的に根本的にundifindが代入されないようにエラー分岐を作るべき。
                             //issueに書いとく。
-                            if (data_detail.latest_ID == tweet[I].id) { break; }
-                        } catch (error) {//強制的にbreakする
-                            break;
+                            //実装しました
+                            try {
+                                if (data_detail.latest_ID === tweet[I].id) { break; }
+                            } catch (error) {
+                                any_notification(ServerDATA, "emergancy", "致命的なエラーが起きました。tweet[0]がundifindではないのにエラーが出ています。")//チャンネルに流す。引数は（[データ],プロパティの名前,送信内容のテキスト）
+                                any_notification(ServerDATA, "emergancy", "エラーの名前:" + error.name)
+                                any_notification(ServerDATA, "emergancy", "エラーの内容:" + error.message)
+                            }
                         };
                     };
 
                 };
                 try {
-                    if (!skipflag == 1) {
+                    if (!skipflag === 1) {
                         //ここからは入手したデーターの変換処理 & 古いものから順に流すためにいろいろする    
                         // for (I = 0; I < DATANAMEprop.length; I++) {
                         //     //サーバ一覧のIDを引っ張り出す
@@ -252,7 +272,7 @@ async function get_user_tweet(userID, count) {
                         for (let I = 0; I < length2.length; I++) {
                             const text = "https://twitter.com/" + tweet[I].user.id + "/status/" + tweet[I].id_str//アクセスできる形式に変換
                             // any_notification(ServerDATA, data_detail.prop, text)//チャンネルに流す。引数は（[データ],プロパティの名前,送信内容のテキスト
-                            if (ServerDATA[data_detail.prop].last == tweet[I].id) {
+                            if (ServerDATA[data_detail.prop].last === tweet[I].id) {
                                 skipflag = 1
                                 break;
                             }
@@ -274,7 +294,7 @@ async function get_user_tweet(userID, count) {
                     console.log("重大なエラー！")
                     any_notification(ServerDATA, "emergancy", "なにかbotに障害が出ています! 参照したprop:" + data_detail.prop)
                 }
-                //     if (skipflag == 1) { any_notification(ServerDATA, data_detail.prop, "更新ないで？") }
+                //     if (skipflag === 1) { any_notification(ServerDATA, data_detail.prop, "更新ないで？") }
 
             } else {//一件しか取得しない場合
                 // try {
@@ -298,14 +318,14 @@ async function get_user_tweet(userID, count) {
 
     DIclient.on('messageCreate', async message => {//DISCORDのメッセージに関する処理いろいろ
         //デバッグコマンド一覧
-        if (message.content == '!debug_id') {//ID表示用のデバッグ
+        if (message.content === '!debug_id') {//ID表示用のデバッグ
             // setchannel(messege)//setchannelする（）
             console.log(message.channel)//でばっぐ
             console.log(`チャンネルID: ${message.channel.id} サーバーID: ${message.guild.id}`);
             message.channel.send(`チャンネルID: ${message.channel.id} サーバーID: ${message.guild.id}`);
             //     // message.channel.send('hi!');
             // };
-            // if (message.content == 'ICEは') {//ID表示用のデバッグ
+            // if (message.content === 'ICEは') {//ID表示用のデバッグ
             //     // setchannel(messege)//setchannelする（）
             //     console.log(message.channel)//でばっぐ
             //     console.log(`チャンネルID: ${message.channel.id} サーバーID: ${message.guild.id}`);
@@ -315,18 +335,18 @@ async function get_user_tweet(userID, count) {
         };
 
 
-        if (message.content == '!debug_send') {//チャンネルにテストメッセージを送る
+        if (message.content === '!debug_send') {//チャンネルにテストメッセージを送る
             message.channel.send(`予約されたチャンネルに情報を送信します`);
             any_notification(ServerDATA, "DEBUG", "TESTING NOW");
         };
         //形式 !debugset プロパティ名!サービス名@ユーザー名
-        if (message.content == '!debug_obj') {//チャンネルを記録する
+        if (message.content === '!debug_obj') {//チャンネルを記録する
             // setchannel(messege)//setchannelする（）
             message.channel.send(`オブジェクトデーターを出力します。`);
             message.channel.send(JSON.stringify(ServerDATA));
         };
 
-        if (message.content == '!debug_NIKKE') {//本業
+        if (message.content === '!debug_NIKKE') {//本業
             console.log("debug_nuking!")
 
 
@@ -336,7 +356,7 @@ async function get_user_tweet(userID, count) {
         //</デバッグ一覧>
 
         {//本番コマンド
-            if (message.content == '!TWN_help') {//チャンネルを記録する
+            if (message.content === '!TWN_help') {//チャンネルを記録する
                 message.channel.send(`IDなどのデーターを保存します。`);
                 save_server_data(ServerDATA);
             };
@@ -352,7 +372,7 @@ async function get_user_tweet(userID, count) {
 
                 message.channel.send(`値を正しく設定しました。`);
 
-                if (message.content == '!TWN_start') {//定義されたチャンネルにツイートを投げる
+                if (message.content === '!TWN_start') {//定義されたチャンネルにツイートを投げる
                     message.channel.send(`起動中...`);
                     const PROPNAME = message.content.slice(11, message.content.indexOf("/")); //ユーザー名
                     setInterval(async () => {//定期的にツイート等確認する
@@ -362,14 +382,20 @@ async function get_user_tweet(userID, count) {
                         for (I_looper = 0; I_looper < length.length; I_looper++) {//propの数を検知してその分だけまわす
                             const alpha = length[I_looper].indexOf("SID")
                             if (alpha !== 0) {//SIDを除外
-                                if (!(length[I_looper] == "emergancy")) {//emergancyを除外
+                                if (!(length[I_looper] === "emergancy")) {//emergancyを除外
                                     //  console.log("君はどういう関数難題？" + length[I_looper])
-                                    const data_detail = {
-                                        get_data_type: "USER",
-                                        prop: length[I_looper],
-                                        limit_get: Serverconifg.countlimit
-                                    };
-                                    await twitter_send(ServerDATA, data_detail);
+                                    try {
+                                        const data_detail = {
+                                            get_data_type: "USER",
+                                            prop: length[I_looper],
+                                            limit_get: Serverconifg.countlimit
+                                        };
+                                        await twitter_send(ServerDATA, data_detail);
+                                    } catch (error) {//想定外のエラーが出た場合にとりあえず動作を継続する
+                                        any_notification(ServerDATA, "emergancy", "めちゃくちゃまずいで！(CV.茜ちゃん)")
+                                        any_notification(ServerDATA, "emergancy", "エラーの名前はコレや:" + error.name)
+                                        any_notification(ServerDATA, "emergancy", "エラーの内容はコレや:" + error.message)
+                                    }
                                 };
                             };
                         };
