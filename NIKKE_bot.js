@@ -275,7 +275,7 @@ async function get_user_tweet(userID, count) {
 
 
                 try {
-                    if (skipflag !== true) {
+                    if (!skipflag) {//スキップフラグがtrueなら実行しない
                         //ここからは入手したデーターの変換処理 & 古いものから順に流すためにいろいろする    
                         // for (I = 0; I < DATANAMEprop.length; I++) {
                         //     //サーバ一覧のIDを引っ張り出す
