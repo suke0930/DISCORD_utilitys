@@ -282,8 +282,7 @@ async function get_user_tweet(userID, count) {
                         //     const NIKKE_ID_LIST = "SID" + DATANAMEprop//↑のobject.keyに対する配列番号によるデーターの取得
                         //     //ServerDATA[NIKKE_ID_LIST]==Server.DATAの、"SID"+ServerDATA.[DATENAME]に対するkeyの配列番号を用いたキーの取得
                         //     sendmessege(ServerDATA[NIKKE_ID_LIST].serverID, ServerDATA[NIKKE_ID_LIST].channelID, TEXT)
-                        // };
-                        const length2 = Object.keys(tweet)//tweetの配列数を計算する
+                        // }
 
 
                         for (const tweetone of tweet) {//
