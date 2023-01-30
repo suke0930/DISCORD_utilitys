@@ -447,11 +447,6 @@ async function get_user_tweet(userID, count) {
 
 
 
-            /**VScodeくんの変数の概要定義
-             * @typedef {Object} DICONFIG DISCORDのconfigデータ
-             * @typedef {Object} twconfig DISCORDのconfigデータ
-             * @typedef {object} ServerDATA 鯖のデーター
-             **/
 
 
 
