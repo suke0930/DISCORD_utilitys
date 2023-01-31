@@ -375,16 +375,18 @@ async function get_user_tweet(userID, count) {
         //</デバッグ一覧>
 
         {//本番コマンド
-            if (message.content === '!TWN_help') {//チャンネルを記録する
-                message.channel.send(`IDなどのデーターを保存します。`);
-                save_server_data(ServerDATA);
-            };
+            //   if (message.content === '!TWN_help') {//チャンネルを記録する
+            //       message.channel.send(`IDなどのデーターを保存します。`);
+            //      save_server_data(ServerDATA);
+            //    };
 
             if (message.content.startsWith('!TWN_prop_plat')) {//プロパティにプラットフォームとユーザを紐づける
+                q               //書式 !TWN_prop_plat prop/service$user
 
-                const PROPNAME = message.content.slice(15, message.content.indexOf("/")); //ユーザー名
-                const platname = message.content.slice(message.content.indexOf("/") + 1, message.content.indexOf("$")); //サービス
-                const USERNAME = message.content.slice(message.content.indexOf("$") + 1); //ユーザー名
+                const PROPNAME = message.content.substring(message.content.indexOf('!TWN_prop_plat '), message.content.indexOf('/')); //prop名
+
+                const platname = message.content.slice(message.content.indexOf('/'), message.content.indexOf('$')); //サービス
+                const USERNAME = message.content.slice(message.content.indexOf('$')); //ユーザー名
 
                 console.log('prop名:' + PROPNAME + ' サービス名:' + platname + ' ユーザー名:' + USERNAME)
                 addPROP(ServerDATA, PROPNAME, platname, USERNAME)
@@ -393,7 +395,7 @@ async function get_user_tweet(userID, count) {
 
                 if (message.content === '!TWN_start') {//定義されたチャンネルにツイートを投げる
                     message.channel.send(`起動中...`);
-                    const PROPNAME = message.content.slice(11, message.content.indexOf("/")); //ユーザー名
+                    // const PROPNAME = message.content.slice(11, message.content.indexOf("/")); //ユーザー名
                     setInterval(async () => {//定期的にツイート等確認する
                         console.log("るーぷ");
                         const length = Object.keys(ServerDATA);//SERVERDATAちょっかのもろもろをしらべる
@@ -424,7 +426,7 @@ async function get_user_tweet(userID, count) {
                     Serverconifg.looptime
                 };
                 if (message.content.startsWith('!TWN_delete')) {//本業
-                    const PROPNAME = message.content.slice(12); //ユーザー名
+                    const PROPNAME = message.content.substring(message.content.indexOf('!TWN_delete ')); //ユーザー名
                     if (ServerDATA[PROPNAME][message.guildId]) { delete ServerDATA[PROPNAME][message.guildId]; }
                     message.channel.send(`通知を終了します。`);
 
@@ -435,7 +437,9 @@ async function get_user_tweet(userID, count) {
 
                     // // const input2 = 
                     // const SERVICENAME = (message.content.slice(message.content.indexOf("/") + 1, message.content.indexOf("@"))); //サービス名
-                    const PROPNAME = (message.content.slice(14)); //プロパティ名
+
+                    //const PROPNAME = (message.content.slice(14));
+                    const PROPNAME = message.content.substring(message.content.indexOf('!TWN_set_prop ')); //プロパティ名
                     // setchannel(messege)//setchannelする（）
                     find_serverID(ServerDATA, message, PROPNAME);
                     message.channel.send(`チャンネルID: ${ServerDATA["SID" + message.guild.id].channelID} サーバーID: ${message.guild.id} プロパティ: ${PROPNAME}`);
