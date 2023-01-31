@@ -1,1 +1,3 @@
-setInterval(() => { console.log("Hello, World!") }, 1000);
+let flag = 0
+//      flag = 1
+console.log(!flag)

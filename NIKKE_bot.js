@@ -385,8 +385,8 @@ async function get_user_tweet(userID, count) {
 
                 const PROPNAME = message.content.substring(message.content.indexOf('!TWN_prop_plat '), message.content.indexOf('/')); //prop名
 
-                const platname = message.content.slice(message.content.indexOf('/'), message.content.indexOf('$')); //サービス
-                const USERNAME = message.content.slice(message.content.indexOf('$')); //ユーザー名
+                const platname = message.content.substring(message.content.indexOf('/'), message.content.indexOf('$')); //サービス
+                const USERNAME = message.content.substring(message.content.indexOf('$')); //ユーザー名
 
                 console.log('prop名:' + PROPNAME + ' サービス名:' + platname + ' ユーザー名:' + USERNAME)
                 addPROP(ServerDATA, PROPNAME, platname, USERNAME)
