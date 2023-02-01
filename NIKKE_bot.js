@@ -381,12 +381,12 @@ async function get_user_tweet(userID, count) {
             //    };
 
             if (message.content.startsWith('!TWN_prop_plat')) {//プロパティにプラットフォームとユーザを紐づける
-                q               //書式 !TWN_prop_plat prop/service$user
+                //書式 !TWN_prop_plat prop/service$user
+                const messagetext = message.content//メッセージの中身を一段で参照できるようにする。必要かは不明
 
-                const PROPNAME = message.content.substring(message.content.indexOf('!TWN_prop_plat '), message.content.indexOf('/')); //prop名
-
-                const platname = message.content.substring(message.content.indexOf('/'), message.content.indexOf('$')); //サービス
-                const USERNAME = message.content.substring(message.content.indexOf('$')); //ユーザー名
+                const PROPNAME = messagetext.substring(messagetext.indexOf('!TWN_prop_plat '), messagetext.indexOf('/')); //prop名
+                const platname = messagetext.substring(messagetext.indexOf('/'), messagetext.indexOf('$')); //サービス
+                const USERNAME = messagetext.substring(messagetext.indexOf('$')); //ユーザー名
 
                 console.log('prop名:' + PROPNAME + ' サービス名:' + platname + ' ユーザー名:' + USERNAME)
                 addPROP(ServerDATA, PROPNAME, platname, USERNAME)
@@ -426,7 +426,8 @@ async function get_user_tweet(userID, count) {
                     Serverconifg.looptime
                 };
                 if (message.content.startsWith('!TWN_delete')) {//本業
-                    const PROPNAME = message.content.substring(message.content.indexOf('!TWN_delete ')); //ユーザー名
+                    const messagetext = message.content//メッセージの中身を一段で参照できるようにする。必要かは不明
+                    const PROPNAME = messagetext.substring(message.content.indexOf('!TWN_delete ')); //ユーザー名
                     if (ServerDATA[PROPNAME][message.guildId]) { delete ServerDATA[PROPNAME][message.guildId]; }
                     message.channel.send(`通知を終了します。`);
 
@@ -439,7 +440,8 @@ async function get_user_tweet(userID, count) {
                     // const SERVICENAME = (message.content.slice(message.content.indexOf("/") + 1, message.content.indexOf("@"))); //サービス名
 
                     //const PROPNAME = (message.content.slice(14));
-                    const PROPNAME = message.content.substring(message.content.indexOf('!TWN_set_prop ')); //プロパティ名
+                    const messagetext = message.content//メッセージの中身を一段で参照できるようにする。必要かは不明
+                    const PROPNAME = messagetext.substring(messagetext.indexOf('!TWN_set_prop ')); //プロパティ名
                     // setchannel(messege)//setchannelする（）
                     find_serverID(ServerDATA, message, PROPNAME);
                     message.channel.send(`チャンネルID: ${ServerDATA["SID" + message.guild.id].channelID} サーバーID: ${message.guild.id} プロパティ: ${PROPNAME}`);
