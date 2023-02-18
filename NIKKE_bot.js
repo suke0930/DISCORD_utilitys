@@ -394,7 +394,7 @@ async function get_user_tweet(userID, count) {
                 message.channel.send(`値を正しく設定しました。`);
 
                 if (message.content === '!TWN_start') {//定義されたチャンネルにツイートを投げる
-                    message.channel.send(`起動中...`);
+                    message.channel.send("起動中...");
                     // const PROPNAME = message.content.slice(11, message.content.indexOf("/")); //ユーザー名
                     setInterval(async () => {//定期的にツイート等確認する
                         console.log("るーぷ");

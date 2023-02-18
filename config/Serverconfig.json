@@ -1,12 +1,4 @@
 {
     "looptime": "20000",
-    "looptimeはツイートを呼び出す時間です。ミリ秒で表記し、この時間毎にツイートに更新がないか確認します。": "null",
-    "警告：あまりにこの時間を早くしすぎるとBOTの利用を制限される可能性があります。変更しないことをおすすめします。": "null",
-    "[ENGLISH]": "null",
-    "looptime is about time at take check new tweet action. write milisec": "null",
-    "WarNing!:IF you set this value too fast, YOU GET BAN of your bot. developer is not recommand for you EDIT this value!": "null",
-    "countlimit": "3",
-    "サーバーに問い合わせるツイートの最大数です。ツイートが更新されていた場合にどこまで遡るかを指定できます。100以上は推奨しません。": "null",
-    "[ENGLISH]2": "null",
-    "many of search tweet on 1 times.norecomand <100": "null"
+    "countlimit": "3"
 }

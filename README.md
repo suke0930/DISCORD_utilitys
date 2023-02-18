@@ -16,3 +16,7 @@ config/Serverconfig.jsonを書き換えることで設定ができます。
 #### twconfig.json
 - 各項目に応じてTwitterのbotのアクセストークンなどを記入する必要があります
 
+## BOTの権限について
+現状では管理者権限を与える必要があります。
+discord devloperの設定が適切であることを確認してください。
+
