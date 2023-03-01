@@ -264,7 +264,6 @@ async function twitter_send(ServerDATA, data_detail) {//twitterから情報を�
                             if (data_detail.latest_ID === tweet[I].id) { break; }
                         } catch (error) {
                             any_notification(ServerDATA, "emergancy", "致命的なエラーが起きました。tweet[0]がundifindではないのにエラーが出ています。")//チャンネルに流す。引数は（[データ],プロパティの名前,送信内容のテキスト）
-                            // fsでエラー内容を書き出す ファイル名がかぶらないようにNowdate＋番号（存在確認しつつ）でチェックする
                             any_notification(ServerDATA, "emergancy", "エラーの内容:" + error)
                         }
                     };
