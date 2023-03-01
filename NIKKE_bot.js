@@ -3,12 +3,16 @@
 const Twit = require('twitter');//twitterのライブラリ
 const { Client, GatewayIntentBits, Partials } = require('discord.js'); //discord.js から読み込む
 const fs = require('fs');//FILE読み書きするやつ
-const { error } = require('console');
+const cloneObject = require('./lib/lib.js');//ライブラリのインポート
+// const { error } = require('console');
 const twconfig = JSON.parse(fs.readFileSync("./config/twconfig.json", 'utf8').toString());//APIKEY読み出し 前回やったね☆ 
 const dicondigtext = JSON.parse(fs.readFileSync("./config/diconfig.json", 'utf8').toString());//CONFIG読み出し 前回やったね☆
 const ServerDATA = JSON.parse(fs.readFileSync("./ServerDATA.json", 'utf8').toString());//チャンネルID呼び出し
 const Serverconifg = JSON.parse(fs.readFileSync("./config/Serverconfig.json", 'utf8').toString());//チャンネルID呼び出し
+
 const T = new Twit(twconfig);//Tがtwitterの呼び出しライブラリ
+
+// console.log(cloneObject)
 // const serverID = {//サーバーIDのデーターベース置き場
 //     server1: 0,
 //     server2: 0
@@ -91,15 +95,7 @@ function savejson(saveDATA, Jsonname, log_flag) {//jsonセーブするためだ�
     });
 }
 
-function cloneObject(obj) {//最強。オブジェクトをコピーできる。
-    let clone = {};
-    Object.keys(obj).forEach((key) => {
-        obj[key] != null && typeof obj[key] === 'object'
-            ? (clone[key] = cloneObject(obj[key]))
-            : (clone[key] = obj[key]);
-    });
-    return clone;
-}
+
 ///===================<Twwiterへの要求処理のテンプレ>=========================================
 /**
  * 指定されたユーザーの最新ツイートを取得する。
