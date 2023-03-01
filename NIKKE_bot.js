@@ -3,7 +3,8 @@
 const Twit = require('twitter');//twitterのライブラリ
 const { Client, GatewayIntentBits, Partials } = require('discord.js'); //discord.js から読み込む
 const fs = require('fs');//FILE読み書きするやつ
-const cloneObject = require('./lib/lib.js');//ライブラリのインポート
+const { cloneObject } = require('./lib/lib.js');//ライブラリのインポート]
+const { Nowdate } = require('./lib/lib.js');//ライブラリのインポート
 // const { error } = require('console');
 const twconfig = JSON.parse(fs.readFileSync("./config/twconfig.json", 'utf8').toString());//APIKEY読み出し 前回やったね☆ 
 const dicondigtext = JSON.parse(fs.readFileSync("./config/diconfig.json", 'utf8').toString());//CONFIG読み出し 前回やったね☆
@@ -306,10 +307,10 @@ async function twitter_send(ServerDATA, data_detail) {//twitterから情報を�
                     ServerDATA[data_detail.prop].last = tweet[0].id;//最後のツイートのIDを保持する
 
                 }
-            } catch {
+            } catch (error) {
                 console.log("重大なエラー！")
                 any_notification(ServerDATA, "emergancy", "なにかbotに障害が出ています! 参照したprop:" + data_detail.prop)
-            }
+            };
             //     if (skipflag === 1) { any_notification(ServerDATA, data_detail.prop, "更新ないで？") }
 
         } else {//一件しか取得しない場合
