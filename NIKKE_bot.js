@@ -4,11 +4,20 @@ const Twit = require('twitter');//twitterのライブラリ
 const { Client, GatewayIntentBits, Partials } = require('discord.js'); //discord.js から読み込む
 const fs = require('fs');//FILE読み書きするやつ
 const cloneObject = require('./lib/lib.js');//ライブラリのインポート
+const Serverconifg = JSON.parse(fs.readFileSync("./config/Serverconfig.json", 'utf8').toString());//configよみだし
+const tokenpath = Serverconifg.tokenpath;//トークンの保存先を参照
+/** 
+ * @param {String} tokenpath トークンの保存先
+ **/
 // const { error } = require('console');
-const twconfig = JSON.parse(fs.readFileSync("./config/twconfig.json", 'utf8').toString());//APIKEY読み出し 前回やったね☆ 
-const dicondigtext = JSON.parse(fs.readFileSync("./config/diconfig.json", 'utf8').toString());//CONFIG読み出し 前回やったね☆
-const ServerDATA = JSON.parse(fs.readFileSync("./ServerDATA.json", 'utf8').toString());//チャンネルID呼び出し
-const Serverconifg = JSON.parse(fs.readFileSync("./config/Serverconfig.json", 'utf8').toString());//チャンネルID呼び出し
+if (!fs.existsSync(tokenpath)) {
+    console.log("tokenpathにディレクトリがねぇぞ!")
+    process.exit(1);
+}
+const twconfig = JSON.parse(fs.readFileSync(tokenpath + "/twconfig.json", 'utf8').toString());//APIKEY読み出し 前回やったね☆ 
+const dicondigtext = JSON.parse(fs.readFileSync(tokenpath + "/diconfig.json", 'utf8').toString());//CONFIG読み出し 前回やったね☆
+const ServerDATA = JSON.parse(fs.readFileSync(tokenpath + "/ServerDATA.json", 'utf8').toString());//サーバーデータ呼び出し
+
 
 const T = new Twit(twconfig);//Tがtwitterの呼び出しライブラリ
 
@@ -163,7 +172,7 @@ function sendmessege(SID, CID, messege) {//指定されたチャンネルにメ�
 };
 
 function save_server_data(ServerDATA) {//チャンネルに関する情報を保存する
-    savejson(ServerDATA, "ServerDATA.json", 1)
+    savejson(ServerDATA, tokenpath + "/ServerDATA.json", 1)
 
 };
 function addPROP(ServerDATA, PROPNAME, platname, USERNAME) {//PROPに詳細が追加されたりした場合に追加などをする
