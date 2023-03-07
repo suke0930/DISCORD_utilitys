@@ -3,12 +3,17 @@
 const Twit = require('twitter');//twitterのライブラリ
 const { Client, GatewayIntentBits, Partials } = require('discord.js'); //discord.js から読み込む
 const fs = require('fs');//FILE読み書きするやつ
-const cloneObject = require('./lib/lib.js');//ライブラリのインポート
+
+const { cloneObject } = require('./lib/lib.js');//ライブラリのインポート
+const { Nowdate } = require('./lib/lib.js');//ライブラリのインポート
 const Serverconifg = JSON.parse(fs.readFileSync("./config/Serverconfig.json", 'utf8').toString());//configよみだし
 const tokenpath = Serverconifg.tokenpath;//トークンの保存先を参照
 /** 
  * @param {String} tokenpath トークンの保存先
  **/
+
+
+
 // const { error } = require('console');
 if (!fs.existsSync(tokenpath)) {
     console.log("tokenpathにディレクトリがねぇぞ!")
@@ -257,6 +262,7 @@ async function twitter_send(ServerDATA, data_detail) {//twitterから情報を�
                     console.log("Error!111");
                     errorflag = 1
                     any_notification(ServerDATA, "emergancy", "なにかbotに障害が出ています！get_user_tweetのpromiseがエラーを吐いたようです！")//チャンネルに流す。引数は（[データ],プロパティの名前,送信内容のテキスト）
+                    any_notification(ServerDATA, "emergancy", "エラーの内容:" + error)
                     if (zero_is_undifind === 1) {
                         any_notification(ServerDATA, "emergancy", "どうやらtweet[0]すら消滅したようです...　参照されたpropsは" + prop + "です。")//チャンネルに流す。引数は（[データ],プロパティの名前,送信内容のテキスト）}
                     }
@@ -271,8 +277,7 @@ async function twitter_send(ServerDATA, data_detail) {//twitterから情報を�
                             if (data_detail.latest_ID === tweet[I].id) { break; }
                         } catch (error) {
                             any_notification(ServerDATA, "emergancy", "致命的なエラーが起きました。tweet[0]がundifindではないのにエラーが出ています。")//チャンネルに流す。引数は（[データ],プロパティの名前,送信内容のテキスト）
-                            any_notification(ServerDATA, "emergancy", "エラーの名前:" + error.name)
-                            any_notification(ServerDATA, "emergancy", "エラーの内容:" + error.message)
+                            any_notification(ServerDATA, "emergancy", "エラーの内容:" + error)
                         }
                     };
                 };
@@ -315,10 +320,11 @@ async function twitter_send(ServerDATA, data_detail) {//twitterから情報を�
                     ServerDATA[data_detail.prop].last = tweet[0].id;//最後のツイートのIDを保持する
 
                 }
-            } catch {
+            } catch (error) {
                 console.log("重大なエラー！")
                 any_notification(ServerDATA, "emergancy", "なにかbotに障害が出ています! 参照したprop:" + data_detail.prop)
-            }
+                any_notification(ServerDATA, "emergancy", "エラーの内容:" + error)
+            };
             //     if (skipflag === 1) { any_notification(ServerDATA, data_detail.prop, "更新ないで？") }
 
         } else {//一件しか取得しない場合
@@ -400,31 +406,37 @@ DIclient.on('messageCreate', async message => {//DISCORDのメッセージに関
                 // const PROPNAME = message.content.slice(11, message.content.indexOf("/")); //ユーザー名
                 setInterval(async () => {//定期的にツイート等確認する
                     console.log("るーぷ");
-                    const length = Object.keys(ServerDATA);//SERVERDATAちょっかのもろもろをしらべる
-                    save_server_data(ServerDATA);
-                    for (I_looper of ServerDATA) {//propの数を検知してその分だけまわす
+                    try {
+                        const length = Object.keys(ServerDATA);//SERVERDATAちょっかのもろもろをしらべる
+                        save_server_data(ServerDATA);
+                        for (I_looper of ServerDATA) {//propの数を検知してその分だけまわす
 
-                        const alpha = I_looper.indexOf("SID")
-                        if (alpha !== 0) {//SIDを除外
-                            if (!(I_looper === "emergancy")) {//emergancyを除外
-                                //  console.log("君はどういう関数難題？" + I_looper)
-                                try {
-                                    const data_detail = {
-                                        get_data_type: "USER",
-                                        prop: I_looper,
-                                        limit_get: Serverconifg.countlimit
-                                    };
-                                    await twitter_send(ServerDATA, data_detail);
-                                } catch (error) {//想定外のエラーが出た場合にとりあえず動作を継続する
-                                    any_notification(ServerDATA, "emergancy", "めちゃくちゃまずいで！(CV.茜ちゃん)")
-                                    any_notification(ServerDATA, "emergancy", "エラーの名前はコレや:" + error.name)
-                                    any_notification(ServerDATA, "emergancy", "エラーの内容はコレや:" + error.message)
-                                }
+                            const alpha = I_looper.indexOf("SID")
+                            if (alpha !== 0) {//SIDを除外
+                                if (!(I_looper === "emergancy")) {//emergancyを除外
+                                    //  console.log("君はどういう関数難題？" + I_looper)
+                                    try {
+                                        const data_detail = {
+                                            get_data_type: "USER",
+                                            prop: I_looper,
+                                            limit_get: Serverconifg.countlimit
+                                        };
+                                        await twitter_send(ServerDATA, data_detail);
+                                    } catch (error) {//想定外のエラーが出た場合にとりあえず動作を継続する
+                                        any_notification(ServerDATA, "emergancy", "めちゃくちゃまずいで！(CV.茜ちゃん)")
+                                        any_notification(ServerDATA, "emergancy", "エラーの名前はコレや:" + error.name)
+                                        any_notification(ServerDATA, "emergancy", "エラーの内容はコレや:" + error.message)
+                                    }
+                                };
                             };
                         };
-                    };
-                    console.log("無限ループやないで！")
+                    } catch (error) {
+                        any_notification(ServerDATA, "emergancy", "この世の終わりなのだ(CV.ずんだもん)")
+                        any_notification(ServerDATA, "emergancy", "エラーの内容:" + error)
+                    }
+
                 }, Serverconifg.looptime);
+
                 Serverconifg.looptime
             };
             if (message.content.startsWith('!TWN_delete')) {//本業
