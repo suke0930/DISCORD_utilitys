@@ -1,4 +1,5 @@
 {
     "looptime": "20000",
-    "countlimit": "3"
+    "countlimit": "3",
+    "tokenpath": "./config"
 }
