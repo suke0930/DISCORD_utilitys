@@ -1,3 +1,5 @@
+# 開発終了のお知らせ
+twitterがXになりAPIが死んだので、このレポジトリは開発終了にします。
 # didactic-giggle
 discord上でtwitterのユーティリティを利用できるようにするbotです。
 今現在、Discord上の特定のチャンネルにtwitterの特定のユーザーのツイートを自動的に流すことに対応しています。
